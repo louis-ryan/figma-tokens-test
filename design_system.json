@@ -1,0 +1,14 @@
+{
+  "global": {
+    "primary orange": {
+      "$type": "color",
+      "$value": "#d9ae89"
+    }
+  },
+  "$themes": [],
+  "$metadata": {
+    "tokenSetOrder": [
+      "global"
+    ]
+  }
+}
