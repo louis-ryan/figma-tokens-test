@@ -12,8 +12,12 @@ on:
 jobs:
   convert:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -23,6 +27,19 @@ jobs:
 
       - name: Convert design tokens to stylesheet
         run: node scripts/convert-design-tokens.js
+
+      - name: Commit and push stylesheet
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/design-tokens.css
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update design-tokens.css from design_system.json"
+            git push
+          fi
 
       - name: Upload generated stylesheet
         uses: actions/upload-artifact@v4
