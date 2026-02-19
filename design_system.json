@@ -53,7 +53,7 @@
       },
       "heading": {
         "$type": "color",
-        "$value": "#00ff1a"
+        "$value": "#0200ff"
       },
       "card-bg": {
         "$type": "color",
