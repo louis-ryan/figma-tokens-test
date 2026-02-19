@@ -1,0 +1,90 @@
+#!/usr/bin/env node
+/**
+ * Converts design_system.json (design tokens) into a CSS stylesheet with CSS custom properties.
+ * Usage: node scripts/convert-design-tokens.js [input] [output]
+ * Default: design_system.json -> src/design-tokens.css
+ */
+
+import { readFileSync, writeFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = resolve(__dirname, '..');
+
+const inputPath = resolve(root, process.argv[2] || 'design_system.json');
+const outputPath = resolve(root, process.argv[3] || 'src/design-tokens.css');
+
+function toCssVarName(key) {
+  return `--${String(key)
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-_]/g, '')}`;
+}
+
+function extractTokens(obj, prefix = '') {
+  const tokens = [];
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (key.startsWith('$')) continue;
+
+    const fullKey = prefix ? `${prefix}-${key}` : key;
+
+    if (value && typeof value === 'object' && '$value' in value) {
+      tokens.push([fullKey, value.$value]);
+    } else if (value && typeof value === 'object' && !('$type' in value)) {
+      tokens.push(...extractTokens(value, fullKey));
+    }
+  }
+
+  return tokens;
+}
+
+function formatValue(value, type) {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number') return `${value}`;
+  if (Array.isArray(value)) {
+    if (type === 'fontFamily') return value.join(', ');
+    if (type === 'shadow' || type === 'border') return value.join(', ');
+  }
+  return String(value);
+}
+
+function run() {
+  const content = readFileSync(inputPath, 'utf-8');
+  const data = JSON.parse(content);
+
+  const lines = [
+    '/* Auto-generated from design_system.json - do not edit manually */',
+    ':root {',
+  ];
+
+  const tokenSets = data.$metadata?.tokenSetOrder || Object.keys(data).filter((k) => !k.startsWith('$'));
+
+  for (const setName of tokenSets) {
+    const set = data[setName];
+    if (!set || typeof set !== 'object') continue;
+
+    const tokens = extractTokens(set);
+
+    for (const [key, tokenData] of tokens) {
+      const varName = toCssVarName(key);
+      const value = typeof tokenData === 'object' && tokenData !== null && '$value' in tokenData
+        ? tokenData.$value
+        : tokenData;
+      const type = typeof tokenData === 'object' && tokenData !== null && '$type' in tokenData
+        ? tokenData.$type
+        : null;
+      const formatted = formatValue(value, type);
+      lines.push(`  ${varName}: ${formatted};`);
+    }
+  }
+
+  lines.push('}');
+  lines.push('');
+
+  writeFileSync(outputPath, lines.join('\n'), 'utf-8');
+  console.log(`Generated ${outputPath} from ${inputPath}`);
+}
+
+run();

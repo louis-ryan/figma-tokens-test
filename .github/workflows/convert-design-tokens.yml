@@ -1,0 +1,31 @@
+name: Convert Design Tokens
+
+on:
+  push:
+    paths:
+      - 'design_system.json'
+  pull_request:
+    paths:
+      - 'design_system.json'
+  workflow_dispatch:
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Convert design tokens to stylesheet
+        run: node scripts/convert-design-tokens.js
+
+      - name: Upload generated stylesheet
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-tokens
+          path: src/design-tokens.css
