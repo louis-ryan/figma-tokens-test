@@ -31,7 +31,7 @@ function extractTokens(obj, prefix = '') {
     const fullKey = prefix ? `${prefix}-${key}` : key;
 
     if (value && typeof value === 'object' && '$value' in value) {
-      tokens.push([fullKey, value.$value]);
+      tokens.push([fullKey, value]);
     } else if (value && typeof value === 'object' && !('$type' in value)) {
       tokens.push(...extractTokens(value, fullKey));
     }
@@ -50,6 +50,25 @@ function formatValue(value, type) {
   return String(value);
 }
 
+/** Returns { tab, presenter } for storybook-design-token addon annotations */
+function getCategoryAndPresenter(key, type) {
+  const k = key.toLowerCase();
+  if (type === 'color') return { tab: 'Colors', presenter: 'Color' };
+  if (type === 'fontFamily') return { tab: 'Font Family', presenter: 'FontFamily' };
+  if (type === 'fontWeight') return { tab: 'Font Weight', presenter: 'FontWeight' };
+  if (type === 'shadow') return { tab: 'Shadow', presenter: 'Shadow' };
+  if (type === 'duration') return { tab: 'Animation', presenter: 'Animation' };
+  if (type === 'dimension') {
+    if (k.startsWith('font-size')) return { tab: 'Font Size', presenter: 'FontSize' };
+    if (k.startsWith('font-letter')) return { tab: 'Letter Spacing', presenter: 'LetterSpacing' };
+    if (k.startsWith('spacing')) return { tab: 'Spacing', presenter: 'Spacing' };
+    if (k.startsWith('radius')) return { tab: 'Border Radius', presenter: 'BorderRadius' };
+    if (k.startsWith('layout') || k.startsWith('breakpoint')) return { tab: 'Layout', presenter: 'Spacing' };
+    return { tab: 'Layout', presenter: 'Spacing' };
+  }
+  return { tab: 'Other', presenter: 'Spacing' };
+}
+
 function run() {
   const content = readFileSync(inputPath, 'utf-8');
   const data = JSON.parse(content);
@@ -61,6 +80,8 @@ function run() {
 
   const tokenSets = data.$metadata?.tokenSetOrder || Object.keys(data).filter((k) => !k.startsWith('$'));
 
+  let lastTab = null;
+
   for (const setName of tokenSets) {
     const set = data[setName];
     if (!set || typeof set !== 'object') continue;
@@ -68,14 +89,23 @@ function run() {
     const tokens = extractTokens(set);
 
     for (const [key, tokenData] of tokens) {
-      const varName = toCssVarName(key);
-      const value = typeof tokenData === 'object' && tokenData !== null && '$value' in tokenData
-        ? tokenData.$value
-        : tokenData;
       const type = typeof tokenData === 'object' && tokenData !== null && '$type' in tokenData
         ? tokenData.$type
         : null;
+      const value = typeof tokenData === 'object' && tokenData !== null && '$value' in tokenData
+        ? tokenData.$value
+        : tokenData;
       const formatted = formatValue(value, type);
+      const varName = toCssVarName(key);
+
+      const { tab, presenter } = getCategoryAndPresenter(key, type);
+      if (tab !== lastTab) {
+        lines.push('  /**');
+        lines.push(`   * @tokens ${tab}`);
+        lines.push(`   * @presenter ${presenter}`);
+        lines.push('   */');
+        lastTab = tab;
+      }
       lines.push(`  ${varName}: ${formatted};`);
     }
   }

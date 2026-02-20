@@ -1,5 +1,9 @@
 /* Auto-generated from design_system.json - do not edit manually */
 :root {
+  /**
+   * @tokens Colors
+   * @presenter Color
+   */
   --color-sidebar-start: #1a1d24;
   --color-sidebar-end: #13161a;
   --color-sidebar-text: #e4e6eb;
@@ -18,7 +22,15 @@
   --color-error: #dc2626;
   --color-border: #f3f4f6;
   --color-chart-label: #9ca3af;
-  --font-family: Plus Jakarta Sans,system-ui,-apple-system,sans-serif;
+  /**
+   * @tokens Font Family
+   * @presenter FontFamily
+   */
+  --font-family: Plus Jakarta Sans, system-ui, -apple-system, sans-serif;
+  /**
+   * @tokens Font Size
+   * @presenter FontSize
+   */
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.8125rem;
   --font-size-base: 0.9375rem;
@@ -26,9 +38,21 @@
   --font-size-lg: 1.25rem;
   --font-size-xl: 1.5rem;
   --font-size-2xl: 1.75rem;
+  /**
+   * @tokens Font Weight
+   * @presenter FontWeight
+   */
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
+  /**
+   * @tokens Letter Spacing
+   * @presenter LetterSpacing
+   */
   --font-letter-spacing: -0.02em;
+  /**
+   * @tokens Spacing
+   * @presenter Spacing
+   */
   --spacing-xs: 0.125rem;
   --spacing-sm: 0.25rem;
   --spacing-md: 0.5rem;
@@ -37,16 +61,36 @@
   --spacing-2xl: 1.25rem;
   --spacing-3xl: 1.5rem;
   --spacing-4xl: 2rem;
+  /**
+   * @tokens Border Radius
+   * @presenter BorderRadius
+   */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 12px;
+  /**
+   * @tokens Layout
+   * @presenter Spacing
+   */
   --layout-sidebar-width: 260px;
   --layout-avatar-size: 40px;
   --layout-chart-height: 180px;
   --layout-chart-bar-min: 24px;
+  /**
+   * @tokens Shadow
+   * @presenter Shadow
+   */
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+  /**
+   * @tokens Animation
+   * @presenter Animation
+   */
   --transition-fast: 0.2s;
   --transition-chart: 0.3s;
+  /**
+   * @tokens Layout
+   * @presenter Spacing
+   */
   --breakpoint-tablet: 1024px;
   --breakpoint-mobile: 768px;
 }
