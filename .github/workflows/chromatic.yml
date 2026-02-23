@@ -10,6 +10,7 @@ jobs:
   chromatic:
     name: Run Chromatic
     runs-on: ubuntu-latest
+    environment: env
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,4 +29,4 @@ jobs:
       - name: Run Chromatic
         run: npm run chromatic
         env:
-          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          CHROMATIC_PROJECT_TOKEN: ${{ vars.CHROMATIC_PROJECT_TOKEN }}
