@@ -8,7 +8,7 @@
         },
         "end": {
           "$type": "color",
-          "$value": "#13161a"
+          "$value": "#13161b"
         }
       },
       "sidebar-text": {
